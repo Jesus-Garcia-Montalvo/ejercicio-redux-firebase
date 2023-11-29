@@ -2,7 +2,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   GoogleAuthProvider,
-  signInAnonymously,
+  signInWithPopup,
 } from "firebase/auth";
 import { setError, setIsAuthenticate, setUser } from "./userSlice";
 import { auth } from "../../firebase/firebaseConfig";
@@ -37,15 +37,16 @@ export const createAnAccountAsync = (newUser) => async (dispatch) => {
   }
 };
 
-export const loginGoggle = () => {
+export const loginGoogle = () => {
   const provider = new GoogleAuthProvider();
   return async (dispatch) => {
     try {
-      const usercredential = await signInAnonymously(auth, provider);
-      console.log(usercredential);
+      const userCredencial = await signInWithPopup(auth, provider);
+      console.log(userCredencial);
       dispatch(setIsAuthenticate(true));
-      dispatch(setUser(usercredential.user));
+      dispatch(setUser(userCredencial.user));
     } catch (error) {
+      dispatch(setIsAuthenticate(false));
       dispatch(
         setError({ error: true, code: error.code, message: error.message })
       );

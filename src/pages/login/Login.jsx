@@ -1,27 +1,33 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loginGoggle } from "../../store/users/userActions";
-import { Firestore } from "../../firebase/firebaseConfig";
+import { loginGoogle } from "../../store/users/userActions";
+import { firestore } from "../../firebase/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-function Login() {
-  const productColletion = collection(Firestore, "nombre de la colecion");
+
+const Login = () => {
+  const productCollection = collection(firestore, "Productos");
+  const dispatch = useDispatch();
+  const handleLogin = () => {
+    dispatch(loginGoogle());
+  };
 
   useEffect(() => {
     const getData = async () => {
-      const responde = await getDocs(productColletion);
-      console.log(responde);
+      const response = await getDocs(productCollection);
+      const tempArr = [];
+      response.forEach((doc) => {
+        tempArr.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(tempArr);
     };
     getData();
   }, []);
 
-  const handlelogin = () => {
-    dispatch(loginGoggle());
-  };
-  const dispatch = useDispatch();
   return (
     <div>
-      <button onClick={() => handlelogin()}>Entrar con google</button>
+      <button onClick={() => handleLogin()}>Entrar con google</button>
     </div>
   );
-}
+};
+
 export default Login;
