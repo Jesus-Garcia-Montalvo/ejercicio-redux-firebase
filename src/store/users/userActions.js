@@ -15,9 +15,10 @@ export const createAnAccountAsync = (newUser) => async (dispatch) => {
       newUser.password
     );
     await updateProfile(auth.currentUser, {
-      displayName: newUser.displayName,
+      displayName: newUser.name,
       photoURL: newUser.photoURL,
     });
+    console.log(user);
     dispatch(
       setUser({
         id: user.uid,
