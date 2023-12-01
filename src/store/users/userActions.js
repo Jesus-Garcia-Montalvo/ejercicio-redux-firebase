@@ -1,3 +1,13 @@
+import { firestore } from "../../firebase/firebaseConfig";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -5,7 +15,15 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { setError, setIsAuthenticate, setUser } from "./userSlice";
+import {
+  addProduct,
+  deleteProduct,
+  setProducts,
+  updateProduct,
+} from "./productSlice";
 import { auth } from "../../firebase/firebaseConfig";
+
+const productCollection = collection(firestore, "Productos");
 
 export const createAnAccountAsync = (newUser) => async (dispatch) => {
   try {
@@ -48,6 +66,74 @@ export const loginGoogle = () => {
       dispatch(setUser(userCredencial.user));
     } catch (error) {
       dispatch(setIsAuthenticate(false));
+      dispatch(
+        setError({ error: true, code: error.code, message: error.message })
+      );
+    }
+  };
+};
+
+export const getData = () => {
+  return async (dispatch) => {
+    try {
+      const tempArr = [];
+      const response = await getDocs(productCollection);
+      response.forEach((item) => {
+        tempArr.push({ id: item.id, ...item.data() });
+      });
+      dispatch(setProducts(tempArr));
+    } catch (error) {
+      dispatch(
+        setError({ error: true, code: error.code, message: error.message })
+      );
+    }
+  };
+};
+
+export const createData = (product) => {
+  return async (dispatch) => {
+    try {
+      let tempObject = { ...product };
+      const response = await addDoc(productCollection, product);
+      console.log(response);
+      tempObject.id = response.id;
+      dispatch(addProduct(tempObject));
+    } catch (error) {
+      dispatch(
+        setError({ error: true, code: error.code, message: error.message })
+      );
+    }
+  };
+};
+
+export const updateData = (product) => {
+  const documentRef = doc(
+    productCollection,
+    product.id
+  ); /** Referencia del documento */
+  return async (dispatch) => {
+    try {
+      dispatch(updateProduct(product));
+      delete product.id;
+      await setDoc(documentRef, product);
+      // console.log(response);
+    } catch (error) {
+      dispatch(
+        setError({ error: true, code: error.code, message: error.message })
+      );
+    }
+  };
+};
+
+export const deleteData = (id) => {
+  const documentRef = doc(productCollection, id);
+  return async (dispatch) => {
+    try {
+      dispatch(deleteProduct(id));
+      const response = await deleteDoc(documentRef);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
       dispatch(
         setError({ error: true, code: error.code, message: error.message })
       );

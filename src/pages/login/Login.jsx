@@ -1,42 +1,30 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { loginGoogle } from "../../store/users/userActions";
+import { getData, loginGoogle } from "../../store/users/userActions";
 import { firestore } from "../../firebase/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
 const Login = () => {
-  const productCollection = collection(firestore, "Productos");
   const dispatch = useDispatch();
+
   const handleLogin = () => {
     dispatch(loginGoogle());
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      const response = await getDocs(productCollection);
-      const tempArr = [];
-      response.forEach((doc) => {
-        tempArr.push({ id: doc.id, ...doc.data() });
-      });
-      console.log(tempArr);
-    };
-    getData();
-  }, []);
-
   const { register, handleSubmit } = useForm();
 
-  const handleLoginWithEmailAndPasssword = (data) => {
+  const handleLoginWithEmailAndPassword = (data) => {
     console.table(data);
   };
 
   return (
     <div>
-      <form onSubmit={handleSubmit(handleLoginWithEmailAndPasssword)}>
+      <form onSubmit={handleSubmit(handleLoginWithEmailAndPassword)}>
         <input
-          className="loginInput"
-          type="text"
-          placeholder="ingrese correo electronico"
+          type="email"
+          placeholder="ingrese su correo "
           {...register("email")}
         />
         <input
@@ -44,9 +32,8 @@ const Login = () => {
           placeholder="ingrese su contraseña"
           {...register("password")}
         />
-        <button type="submit">Entrar</button>
+        <button type="submit">Inicia Sesión</button>
       </form>
-
       <button type="button" onClick={() => handleLogin()}>
         Entrar con google
       </button>
